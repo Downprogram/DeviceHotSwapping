@@ -1,5 +1,6 @@
-#include "CMMNotificationClient.h"
+﻿#include "CMMNotificationClient.h"
 #include "stdafx.h"
+#include "DeviceInfo.h"
 const CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
 const IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
 
@@ -58,7 +59,6 @@ HRESULT STDMETHODCALLTYPE CMMNotificationClient::OnDefaultDeviceChanged(EDataFlo
 	std::deque<photSwappingInterface> vbs = this->m_vObservers;
 	this->m_lock.unlock();
 	stringT pszFlow;
-	stringT deviceName{ AnalysisDeviceName(pwstrDeviceId) };
 	switch (flow)
 	{
 	case eRender:
@@ -68,10 +68,13 @@ HRESULT STDMETHODCALLTYPE CMMNotificationClient::OnDefaultDeviceChanged(EDataFlo
 		pszFlow = L"eCapture";
 		break;
 	}
-	if (role == eCommunications)//不进行检测将调用一次或一次以上
+	if ((role == eCommunications)&&(pwstrDeviceId != nullptr))//不进行检测将调用一次或一次以上
 	{
+		DeviceInfo info;
+		info.deviceName = AnalysisDeviceName(pwstrDeviceId);
+		info.deviceGuid = pwstrDeviceId;
 		for (const auto& It : vbs)
-			It->deviceTypeChange(deviceName, pszFlow);
+			It->deviceTypeChange(info, pszFlow);
 	}
 	return S_OK;
 }
@@ -93,25 +96,28 @@ HRESULT STDMETHODCALLTYPE CMMNotificationClient::OnDeviceStateChanged(LPCWSTR pw
 	this->m_lock.lock();
 	std::deque<photSwappingInterface> vbs{ this->m_vObservers };
 	this->m_lock.unlock();
-	stringT deviceName{ this->AnalysisDeviceName(pwstrDeviceId) };
+	DeviceInfo info;
+	stringT pszFlow;
+	info.deviceName = AnalysisDeviceName(pwstrDeviceId);
+	info.deviceGuid = pwstrDeviceId;
 	for (const auto& It : vbs)
 	{
 		switch (dwNewState)
 		{
 		case DEVICE_STATE_ACTIVE://设备活动
-			It->deviceInsert(deviceName);
+			It->deviceInsert(info);
 			break;
 		case DEVICE_STATE_DISABLED://设备被禁用
-			It->deviceDisable(deviceName);
+			It->deviceDisable(info);
 			break;
 		case DEVICE_STATE_NOTPRESENT://设备未准备
-			It->decvicePreparation(deviceName);
+			It->decvicePreparation(info);
 			break;
 		case DEVICE_STATE_UNPLUGGED://设备拔出
-			It->deviceUnplug(deviceName);
+			It->deviceUnplug(info);
 			break;
 		default:
-			It->deviceStateAll(deviceName, dwNewState);//自己做处理
+			It->deviceStateAll(info, dwNewState);//自己做处理
 			break;
 		}
 	}

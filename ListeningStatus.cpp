@@ -1,4 +1,4 @@
-#include "ListeningStatus.h"
+﻿#include "ListeningStatus.h"
 #include "stdafx.h"
 ListeningStatus* ListeningStatus::m_pListen = nullptr;
 
