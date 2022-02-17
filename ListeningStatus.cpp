@@ -1,5 +1,6 @@
-﻿#include "ListeningStatus.h"
-#include "stdafx.h"
+﻿#include "stdafx.h"
+#include "ListeningStatus.h"
+
 ListeningStatus* ListeningStatus::m_pListen = nullptr;
 
 ListeningStatus::ListeningStatus()

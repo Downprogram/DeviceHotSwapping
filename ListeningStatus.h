@@ -2,18 +2,17 @@
 描述: 监听设备热插拔 可以在main函数创建单例，进行全局监听
 作者:zhongzhipeng
 ***********************************/
-#ifndef __LISTENINGSTATUS_H__
-
-#define __LISTENINGSTATUS_H__
+#pragma once
 #include "HotSwappingInterface.h"
 #include "CMMNotificationClient.h"
 #include <memory>
 
-class ListeningStatus {
-public:	
+class ListeningStatus
+{
+private:
 	ListeningStatus();
 	~ListeningStatus();
-
+public:
 	static ListeningStatus* GettInstance();
 	static void Release();
 	void Add(const photSwappingInterface&);
@@ -23,5 +22,3 @@ private:
 	CMMNotificationClient pNotify;
 	static ListeningStatus* m_pListen;
 };
-
-#endif

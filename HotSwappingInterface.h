@@ -3,9 +3,8 @@
 	 不能对UI进行处理，如有对UI处理的需要需要自己发送消息
 作者:zhongzhipeng
 ***********************************/
-
-#ifndef __CMMNOTIFICATION_H__
-#define __CMMNOTIFICATION_H__
+#pragma once
+#include <CommonDef.h>
 #include <memory>
 #include <string>
 #include "DeviceInfo.h"
@@ -16,10 +15,8 @@ public:
 	virtual void deviceDisable(const DeviceInfo& deviceInfo) {};//设备禁用
 	virtual void decvicePreparation(const DeviceInfo& deviceInfo) {};//设备未准备
 	virtual void deviceStateAll(const DeviceInfo& deviceInfo, DWORD  dwNewState) {};//设备全部状态，交由自己做处理
-	virtual void deviceTypeChange(const DeviceInfo& deviceInfo, const stringT& type) {};//设备切换会触发，系统检查设备功能会触发
+	virtual void deviceTypeChange(const DeviceInfo& deviceInfo, const tstring& type) {};//设备切换会触发，系统检查设备功能会触发
 	virtual	~HotSwappingInterface() {};
 };
 
-using photSwappingInterface = std::shared_ptr<HotSwappingInterface>;
-
-#endif
+using photSwappingInterface = HotSwappingInterface*;

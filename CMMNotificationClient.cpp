@@ -1,6 +1,7 @@
-﻿#include "CMMNotificationClient.h"
-#include "stdafx.h"
+﻿#include "stdafx.h"
+#include "CMMNotificationClient.h"
 #include "DeviceInfo.h"
+
 const CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
 const IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
 
@@ -58,7 +59,7 @@ HRESULT STDMETHODCALLTYPE CMMNotificationClient::OnDefaultDeviceChanged(EDataFlo
 	this->m_lock.lock();
 	std::deque<photSwappingInterface> vbs = this->m_vObservers;
 	this->m_lock.unlock();
-	stringT pszFlow;
+	tstring pszFlow;
 	switch (flow)
 	{
 	case eRender:
@@ -68,7 +69,7 @@ HRESULT STDMETHODCALLTYPE CMMNotificationClient::OnDefaultDeviceChanged(EDataFlo
 		pszFlow = L"eCapture";
 		break;
 	}
-	if ((role == eCommunications)&&(pwstrDeviceId != nullptr))//不进行检测将调用一次或一次以上
+	if (/*(role == eCommunications)&&*/(pwstrDeviceId != nullptr))//不进行检测将调用一次或一次以上
 	{
 		DeviceInfo info;
 		info.deviceName = AnalysisDeviceName(pwstrDeviceId);
@@ -76,6 +77,18 @@ HRESULT STDMETHODCALLTYPE CMMNotificationClient::OnDefaultDeviceChanged(EDataFlo
 		for (const auto& It : vbs)
 			It->deviceTypeChange(info, pszFlow);
 	}
+	return S_OK;
+}
+
+HRESULT __stdcall CMMNotificationClient::OnDeviceAdded(LPCWSTR pwstrDeviceId)
+{
+	//新的驱动添加
+	return S_OK;
+}
+
+HRESULT __stdcall CMMNotificationClient::OnDeviceRemoved(LPCWSTR pwstrDeviceId)
+{
+	//驱动移除
 	return S_OK;
 }
 
@@ -97,7 +110,7 @@ HRESULT STDMETHODCALLTYPE CMMNotificationClient::OnDeviceStateChanged(LPCWSTR pw
 	std::deque<photSwappingInterface> vbs{ this->m_vObservers };
 	this->m_lock.unlock();
 	DeviceInfo info;
-	stringT pszFlow;
+	tstring pszFlow;
 	info.deviceName = AnalysisDeviceName(pwstrDeviceId);
 	info.deviceGuid = pwstrDeviceId;
 	for (const auto& It : vbs)
@@ -144,7 +157,7 @@ void CMMNotificationClient::Remove(const photSwappingInterface& Interface)
 
 
 //解析设备名
-stringT  CMMNotificationClient::AnalysisDeviceName(LPCWSTR pwstrDeviceId)
+tstring  CMMNotificationClient::AnalysisDeviceName(LPCWSTR pwstrDeviceId)
 {
 	HRESULT hr = S_OK;
 	IMMDevice *pDevice = nullptr;
@@ -172,10 +185,10 @@ stringT  CMMNotificationClient::AnalysisDeviceName(LPCWSTR pwstrDeviceId)
 	{
 		hr = pProps->GetValue(PKEY_Device_FriendlyName, &varString);
 	}
-	stringT deviceName;
+	tstring deviceName;
 	if (hr == S_OK)
 	{
-		stringT str{ varString.pwszVal };
+		tstring str{ varString.pwszVal == NULL ? _T("") : varString.pwszVal };
 		deviceName = std::move( str );
 	}
 	PropVariantClear(&varString);

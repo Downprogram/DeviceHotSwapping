@@ -8,9 +8,7 @@
 	文档：https://docs.microsoft.com/en-us/windows/win32/api/mmdeviceapi/nn-mmdeviceapi-immnotificationclient
 作者:zhongzhipeng
 ***********************************/
-#ifndef __CMMNOTIFICATIONCLIENT_H__
-
-#define __CMMNOTIFICATIONCLIENT_H__
+#pragma once
 #include <Mmdeviceapi.h>
 #include <Functiondiscoverykeys_devpkey.h>
 #include <mutex>
@@ -43,17 +41,9 @@ public:
 	
 	HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR pwstrDeviceId);
 
-	HRESULT STDMETHODCALLTYPE OnDeviceAdded(LPCWSTR pwstrDeviceId)
-	{
-		//新的驱动添加
-		return S_OK;
-	};
+	HRESULT STDMETHODCALLTYPE OnDeviceAdded(LPCWSTR pwstrDeviceId);;
 
-	HRESULT STDMETHODCALLTYPE OnDeviceRemoved(LPCWSTR pwstrDeviceId)
-	{
-		//驱动移除
-		return S_OK;
-	}
+	HRESULT STDMETHODCALLTYPE OnDeviceRemoved(LPCWSTR pwstrDeviceId);
 
 	//设备状态改变时触发
 	HRESULT STDMETHODCALLTYPE OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewState);
@@ -68,7 +58,5 @@ public:
 	void Add(const photSwappingInterface& Interface);
 	void Remove(const photSwappingInterface&);
 private:
-	stringT AnalysisDeviceName(LPCWSTR);
+	tstring AnalysisDeviceName(LPCWSTR);
 };
-
-#endif
